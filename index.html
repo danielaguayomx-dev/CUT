@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi Calculadora Universitaria</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #eef2f7;
+  font-family: Arial, sans-serif;
+  color: #172b4d;
+}
+main {
+  max-width: 440px;
+  margin: 25px auto;
+  padding: 20px;
+}
+h1 { font-size: 25px; text-align: center; }
+h2 { font-size: 20px; }
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 12px #00000012;
+}
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  width: 100%;
+  font-size: 16px;
+  margin: 6px 0;
+  cursor: pointer;
+}
+.secondary { background: #64748b; }
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+label { display: block; margin-top: 10px; }
+.resultado {
+  background: #e0f2fe;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 20px;
+}
+.numero {
+  font-size: 36px;
+  font-weight: bold;
+  color: #0369a1;
+}
+.oculto { display: none; }
+</style>
+</head>
+<body>
+<main>
+<h1>🎓 Mi Calculadora Universitaria</h1>
+
+<section id="inicio" class="card">
+<h2>¿Qué deseas calcular?</h2>
+<button onclick="mostrar('parcial')">Calcular parcial</button>
+<button onclick="mostrar('cuatrimestre')">Calcular cuatrimestre</button>
+</section>
+
+<section id="parcial" class="card oculto">
+<h2>Calcular parcial</h2>
+<div id="preguntas"></div>
+
+<label>Calificación del examen (0 a 10)</label>
+<input id="examen" type="number" min="0" max="10" step="0.01" value="10">
+
+<button onclick="calcularParcial()">Calcular parcial</button>
+<div id="resultadoParcial"></div>
+<button class="secondary" onclick="mostrar('inicio')">Volver</button>
+</section>
+
+<section id="cuatrimestre" class="card oculto">
+<h2>Calcular cuatrimestre</h2>
+<div id="notas"></div>
+<button onclick="calcularCuatrimestre()">Calcular cuatrimestre</button>
+<div id="resultadoCuatrimestre"></div>
+<button class="secondary" onclick="mostrar('inicio')">Volver</button>
+</section>
+</main>
+
+<script>
+const criterios = [
+  ["¿Fuiste a todas las clases?", "clases", 15],
+  ["¿Fuiste a todas las vidas universitarias?", "vidas universitarias", 15],
+  ["¿Entregaste todos los trabajos?", "trabajos", 30]
+];
+
+function mostrar(id) {
+  document.querySelectorAll("section").forEach(
+    s => s.classList.add("oculto")
+  );
+  document.getElementById(id).classList.remove("oculto");
+}
+
+function crearPreguntas() {
+  let html = "";
+  criterios.forEach((c, i) => {
+    html += `
+      <div>
+        <label><strong>${c[0]}</strong></label>
+        <select id="respuesta${i}" onchange="cambiar(${i})"
+          style="width:100%;padding:12px;margin:8px 0">
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+        <div id="detalle${i}" class="oculto">
+          <label>Total de ${c[1]}</label>
+          <input id="total${i}" type="number" min="1" step="1">
+          <label>¿Cuántos cumpliste?</label>
+          <input id="hechos${i}" type="number" min="0" step="1">
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById("preguntas").innerHTML = html;
+}
+
+function cambiar(i) {
+  const no = document.getElementById("respuesta"+i).value === "no";
+  document.getElementById("detalle"+i)
+    .classList.toggle("oculto", !no);
+}
+
+function leerNota(id) {
+  const campo = document.getElementById(id);
+  if (campo.value.trim() === "") return null;
+  const n = Number(campo.value);
+  if (!Number.isFinite(n) || n < 0 || n > 10) return null;
+  return n;
+}
+
+function calcularParcial() {
+  let puntos = 40;
+
+  for (let i = 0; i < criterios.length; i++) {
+    const max = criterios[i][2];
+    const respuesta = document.getElementById("respuesta"+i).value;
+
+    if (respuesta === "si") {
+      puntos += max;
+    } else {
+      const totalCampo = document.getElementById("total"+i);
+      const hechosCampo = document.getElementById("hechos"+i);
+      const total = Number(totalCampo.value);
+      const hechos = Number(hechosCampo.value);
+
+      if (!totalCampo.value || !hechosCampo.value ||
+          !Number.isInteger(total) || !Number.isInteger(hechos) ||
+          total <= 0 || hechos < 0 || hechos > total) {
+        alert("Revisa las cantidades de " + criterios[i][1]);
+        return;
+      }
+      puntos += hechos / total * max;
+    }
+  }
+
+  const examen = leerNota("examen");
+  if (examen === null) {
+    alert("Introduce una calificación de examen entre 0 y 10.");
+    return;
+  }
+
+  const actividades = puntos * 0.06;
+  const nota = actividades + examen * 0.4;
+  const aporte = nota * 0.15;
+
+  document.getElementById("resultadoParcial").innerHTML = `
+    <div class="resultado">
+      <p>Calificación del parcial</p>
+      <div class="numero">${nota.toFixed(2)} / 10</div>
+      <p>Actividades: ${actividades.toFixed(2)} / 6</p>
+      <p>Examen: ${(examen * 0.4).toFixed(2)} / 4</p>
+      <strong>Aporte al cuatrimestre:
+        ${aporte.toFixed(3)} / 1.5</strong>
+    </div>
+  `;
+}
+
+function crearNotas() {
+  let html = "";
+  for (let i = 1; i <= 4; i++) {
+    html += `
+      <label>Parcial ${i} (15%)</label>
+      <input id="nota${i}" type="number" min="0" max="10"
+        step="0.01" placeholder="Calificación de 0 a 10">
+    `;
+  }
+  html += `
+    <label>Examen final (40%)</label>
+    <input id="nota5" type="number" min="0" max="10"
+      step="0.01" placeholder="Calificación de 0 a 10">
+  `;
+  document.getElementById("notas").innerHTML = html;
+}
+
+function calcularCuatrimestre() {
+  let total = 0;
+  for (let i = 1; i <= 5; i++) {
+    const nota = leerNota("nota"+i);
+    if (nota === null) {
+      alert("Revisa la calificación " + i);
+      return;
+    }
+    total += nota * (i === 5 ? 0.4 : 0.15);
+  }
+
+  document.getElementById("resultadoCuatrimestre").innerHTML = `
+    <div class="resultado">
+      <p>Calificación final del cuatrimestre</p>
+      <div class="numero">${total.toFixed(2)} / 10</div>
+    </div>
+  `;
+}
+
+crearPreguntas();
+crearNotas();
+</script>
+</body>
+</html>
