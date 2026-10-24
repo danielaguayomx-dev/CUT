@@ -233,6 +233,24 @@ function calcularCuatrimestre() {
     <div class="resultado">
       <p>Calificación final del cuatrimestre</p>
       <div class="numero">${total.toFixed(2)} / 10</div>
+      
+${total < 7 ? `
+  <div style="background:#fff7ed; border:1px solid #f59e0b;
+              border-radius:12px; padding:16px; margin-top:15px;
+              color:#92400e; text-align:left;">
+    <strong>⚠️ Atención a tu calificación</strong>
+    <p>Es probable que debas presentar un examen
+    extraordinario para mejorar tu calificación final.
+    </p>
+    <p><strong>¡Ánimo!</strong> Una calificación no define
+    tu capacidad. Prepárate, y aprovecha la siguiente oportunidad.</p>
+  </div>
+` : `
+  <p style="color:#15803d;">
+    🎉 ¡Buen trabajo! Sigue esforzándote y aprendiendo.
+  </p>
+`}
+
     </div>
   `;
 }
