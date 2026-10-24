@@ -197,6 +197,25 @@ function calcularParcial() {
       <p>Examen: ${(examen * 0.4).toFixed(2)} / 4</p>
       <strong>Aporte al cuatrimestre:
         ${aporte.toFixed(3)} / 1.5</strong>
+        
+${nota < 7 ? `
+  <div style="background:#fff7ed; border:1px solid #f59e0b;
+              border-radius:12px; padding:16px; margin-top:15px;
+              color:#92400e; text-align:left;">
+    <strong>⚠️ Atención a tu calificación</strong>
+    <p>Tu calificación es inferior a 7.
+    Esto podría afectar tu promedio final del cuatrimestre.</p>
+    <p> podrías considerar hacer un extraordinario. </p>
+    <p><strong>¡No te desanimes!</strong>
+    Todavía tienes oportunidades para mejorar.
+   </p>
+  </div>
+` : `
+  <p style="color:#15803d;">
+    🎉 ¡Buen trabajo! Sigue esforzándote y aprendiendo.
+  </p>
+`}
+
     </div>
   `;
 }
